@@ -1,5 +1,5 @@
-from api.endpoints.user import router as user_router
-from api.endpoints.task import router as task_router
+from src.api.endpoints.user import router as user_router
+from src.api.endpoints.task import router as task_router
 from fastapi import APIRouter
 
 main_router = APIRouter(
