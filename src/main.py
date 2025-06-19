@@ -2,13 +2,9 @@ from fastapi import FastAPI
 from api.routes import main_router
 from config.settings import config
 from contextlib import asynccontextmanager
-from repository.database.base import BaseRepository
+from core.models.base import Base
+from repository.session import engine
 import uvicorn
-
-app = FastAPI(
-    lifespan=lifespan
-)
-app.include_router(main_router)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,6 +15,12 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         print("Data Table is drop")
+
+app = FastAPI(
+    lifespan=lifespan
+)
+app.include_router(main_router)
+
 
 if __name__=="__main__":
     uvicorn.run(

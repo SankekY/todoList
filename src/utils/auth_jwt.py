@@ -8,19 +8,17 @@ def encode_jwt(
     payload: dict,
     privet_key: str = config.jwt.secret_key.read_text(),
     alghorithm: str = config.jwt.alghorithm,
-    access_token_expire: int = config.jwt.access_token_expire_minute,
+    access_token_expire_minutes: int = config.jwt.access_token_expire_minute,
     expire_time_delta: timedelta | None = None
 ) -> str:
-    expire: datetime
-    if not expire_timedelta:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=expire_minutes)
-    else:
-        expire = datetime.now(timezone.utc) + expire_timedelta
-
+    expire = datetime.now(timezone.utc) + (
+        expire_time_delta if expire_time_delta 
+        else timedelta(minutes=access_token_expire_minutes)
+    )
     to_encode = payload.copy()
-    to_encode.update(exp=expire)
+    to_encode.update({"exp": int(expire.timestamp())})
     return jwt.encode(
-        claims=to_encode,
+        to_encode,
         key=privet_key,
         algorithm=alghorithm
     )
@@ -41,16 +39,24 @@ def hash_password(
 ) -> str:
     salt  = bcrypt.gensalt()
     return bcrypt.hashpw(
-        password=payload_password,
+        password=payload_password.encode(),
         salt=salt
     )
 
 def verefy_passowrd(
     payload_password: str,
-    hash_password: str
+    hashed_password: str 
 ) -> bool:
-    return bcrypt.checkpw(
-        password=payload_password,
-        hashed_password=hash_password
-    )
+
+    if not payload_password or not hashed_password:
+        return False
+    
+    try:
+        # Преобразуем в bytes если нужно
+        pw_bytes = payload_password.encode('utf-8') if isinstance(payload_password, str) else payload_password
+        hash_bytes = hashed_password.encode('utf-8') if isinstance(hashed_password, str) else hashed_password
         
+        return bcrypt.checkpw(pw_bytes, hash_bytes)
+    except (ValueError, TypeError, AttributeError):
+        return False
+

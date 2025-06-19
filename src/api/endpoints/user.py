@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from api.deps import get_session, get_user_service
@@ -18,7 +18,16 @@ async def get_access_token(
     user_data: OAuth2PasswordRequestForm = Depends(),
     service: UserService = Depends(get_user_service)
 ) -> Token:
-    return Token
+    token =  await service.login_user(UserUpdate(
+        password=user_data.password,
+        username=user_data.username
+    ))
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Не верный логин или пароль!"
+        )
+    return token
 
 @router.post(
     "/register",
@@ -29,4 +38,10 @@ async def register_user(
     user: UserCreate,
     service: UserService = Depends(get_user_service)
 ) -> UserResponse:
-    return await service.create_user(user)
+    new_user = await service.create_user(user)
+    if new_user == None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Такой пользователь уже зарегестрирован"
+        )
+    return new_user

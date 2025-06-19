@@ -17,17 +17,18 @@ from repository.database.task import TaskRepository
 from core.service.task import TaskService
 from core.models.task import Task
 
+
 # --- Depends Code ---
 async def get_user_service(
     session: AsyncSession = Depends(get_session)
 ):
-    repo = UserRepository(session, User)
-    return UserService(repo)
+    repo = UserRepository(model=Task, session=session)
+    return UserService(repository=repo)
 
 async def get_todo_service(
     session: AsyncSession = Depends(get_session)
 ):
-    repo = TaskRepository(session, Task)
+    repo = TaskRepository(model=Task, session=session)
     return TaskService(repository=repo)
 
 aouthBearerSchema = OAuth2PasswordBearer(tokenUrl="api/auth/token")

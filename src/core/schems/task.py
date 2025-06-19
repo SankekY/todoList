@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-
+from datetime import datetime
 
 class TaskBase(BaseModel):
     title: str = Field(..., max_length=100)
@@ -18,6 +18,6 @@ class TaskUpdate(BaseModel):
 class TaskResponse(TaskBase):
     id: int
     owner_id: int
-    
+    created_at: datetime
     class Config:
         from_attributes = True
