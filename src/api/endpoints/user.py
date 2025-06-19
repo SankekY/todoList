@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
-from src.api.deps import get_session, get_user_service
+
+from api.deps import get_session, get_user_service
+
 from core.schems.user import UserResponse, UserCreate, UserBase, UserUpdate
-
+from core.schems.token import Token
 from core.service.user import UserService
-router = APIRouter()
 
+router = APIRouter()
 
 @router.post(
     "/token",

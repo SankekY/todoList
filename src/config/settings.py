@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 from pydantic import BaseModel
 from pathlib import Path
 
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).parent.parent.parent
 # DB_PATH = BASE_DIR / "db.sqlite3"
 
 class JWTConfig(BaseModel):
@@ -12,7 +12,9 @@ class JWTConfig(BaseModel):
     access_token_expire_minute: int = 30
 
 class DataBaseConfig(BaseModel):
-    pass
+    url: str = "sqlite+aiosqlite:///database.db"
+    echo: bool = False
+    max_overflow: int = 10
 
 class ServerConfig(BaseModel):
     host: str = "0.0.0.0"

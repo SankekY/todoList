@@ -1,18 +1,18 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class TaskBase(BaseModel):
     title: str = Field(..., max_length=100)
-    description: Optional[str] = None
+    description: str | None = None
     status: str = Field("todo", pattern="^(todo|in_progress|completed)$")
 
 class TaskCreate(TaskBase):
     pass
 
 class TaskUpdate(BaseModel):
-    title: Optional[str] = Field(None, max_length=100)
-    description: Optional[str] = None
-    status: Optional[str] = Field(None, pattern="^(todo|in_progress|completed)$")
+    title: str | None = Field(None, max_length=100)
+    description: str | None = None
+    status: str | None = Field(None, pattern="^(todo|in_progress|completed)$")
 
 
 class TaskResponse(TaskBase):

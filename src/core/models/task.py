@@ -1,7 +1,9 @@
 from core.models.base import Base
-from sqlalchemy import Integer, String, Column
+from sqlalchemy import Integer, String, Column, Text, ForeignKey
+from sqlalchemy.orm import relationship
 
 class Task(Base):
+    __tablename__ = "Tasks"
     id = Column(Integer, primary_key=True)
     title = Column(String(100))
     description = Column(Text)

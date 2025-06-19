@@ -1,8 +1,10 @@
 from core.models.base import Base
-from sqlalchemy import Column, Integer, String 
+from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy.orm import relationship
 
 
 class User(Base):
+    __tablename__ = "Users"
     id = Column(Integer, primary_key=True)
     username = Column(String(50), unique=True)
     email = Column(String(100), unique=True)
