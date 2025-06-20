@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from api.deps import get_session, get_user_service, get_user_token
-from core.schems.user import UserResponse, UserCreate, UserBase, UserUpdate
+from core.schems.user import UserResponse, UserCreate, UserBase, UserUpdate, UserTokenData
 from core.schems.token import Token, TokenData
 from core.service.user import UserService
 
@@ -20,8 +20,7 @@ async def get_access_token(
 ) -> Token:
     token =  await service.login_user(UserUpdate(
         password=user_data.password,
-        username=user_data.username,
-        email=user_data.username
+        username=user_data.username
     ))
     if not token:
         raise HTTPException(

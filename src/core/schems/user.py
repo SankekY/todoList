@@ -35,9 +35,10 @@ class UserUpdate(BaseModel):
     password: Optional[str] = Field(None, min_length=8)
 
 class UserTokenData(UserBase):
-    id: int
-    is_active: bool 
-    role: str
+    id: int | None = None
+    email: str | None = None
+    is_active: bool | None = None
+    role: str | None = None
 
 
 class UserResponse(UserBase):
