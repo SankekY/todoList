@@ -37,7 +37,7 @@ async def get_todo_service(
 #  --- Get Current Token --- 
 aouthBearerSchema = OAuth2PasswordBearer(tokenUrl="api/token")
 async def get_user_token(
-    token: aouthBearerSchema = Depends()
+    token: str = Depends(aouthBearerSchema)
 ) -> TokenData:
     payload = decode_jwt(token=token)
     return TokenData(**payload)

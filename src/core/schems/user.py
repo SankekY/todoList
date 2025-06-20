@@ -8,22 +8,6 @@ class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr | None = None 
 
-class UserCreate(UserBase):
-    password: str = Field(..., min_length=8, max_length=30)
-
-class UserUpdate(BaseModel):
-    username: Optional[str] = Field(None, min_length=3, max_length=50)
-    email: Optional[EmailStr] = None
-    password: Optional[str] = Field(None, min_length=8)
-
-
-class UserResponse(UserBase):
-    id: int
-    is_active: bool
-    role: str
-    tasks: List[TaskResponse] = []
-    created_at: datetime
-
     class Config:
         from_attributes = True
 
@@ -41,3 +25,26 @@ class UserResponse(UserBase):
                 "tasks": []  # Пустой список по умолчанию
             }
         return data
+
+class UserCreate(UserBase):
+    password: str = Field(..., min_length=8, max_length=30)
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = Field(None, min_length=3, max_length=50)
+    email: Optional[EmailStr] = None
+    password: Optional[str] = Field(None, min_length=8)
+
+class UserTokenData(UserBase):
+    id: int
+    is_active: bool 
+    role: str
+
+
+class UserResponse(UserBase):
+    id: int
+    is_active: bool
+    role: str
+    tasks: List[TaskResponse] = []
+    created_at: datetime
+
+

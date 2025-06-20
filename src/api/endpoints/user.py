@@ -20,7 +20,8 @@ async def get_access_token(
 ) -> Token:
     token =  await service.login_user(UserUpdate(
         password=user_data.password,
-        username=user_data.username
+        username=user_data.username,
+        email=user_data.username
     ))
     if not token:
         raise HTTPException(
@@ -55,11 +56,33 @@ async def get_me(
     token_data: TokenData = Depends(get_user_token),
     service: UserService = Depends(get_user_service)
 ):
-    user = await service.get_user(token_data.username)
+    user = await service.get_user(UserBase(
+        username=token_data.username,
+        email=token_data.email
+    ))
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Не удолось получить данные с сервера!"
         )
     return user
+
+
+@router.patch(
+    "/me",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK
+)
+async def update_user(
+    user: UserUpdate,
+    token_data: TokenData = Depends(get_user_token),
+    service: UserService = Depends(get_user_service)
+) -> UserResponse:
     
+    new_user = await service.update_user(user, int(token_data.sub))
+    if not new_user:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Ошибка при обновление польтзователя"
+        )
+    return new_user

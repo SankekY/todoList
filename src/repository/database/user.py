@@ -47,7 +47,7 @@ class UserRepository(BaseRepository[User]):
                 detail=f"Ошибка при создании пользователя: {str(e)}"
             )
     
-    async def get_user(self, user: UserUpdate) -> UserResponse | None:
+    async def get_user(self, user: UserBase) -> UserResponse | None:
         try:
             existing_user = await self.session.execute(
             select(User).where(
@@ -62,4 +62,29 @@ class UserRepository(BaseRepository[User]):
             raise HTTPException(
                 status_code=500,
                 detail=f"Ошибка при получении пользователя: {str(e)}"
+            )
+
+    async def update_user(self, user: UserUpdate, id: int) -> UserResponse | None:
+        try:
+            existing_user = await self.session.execute(select(User).where(User.id == id))
+
+            user_db = existing_user.scalar_one_or_none()
+            if not user_db:
+                return None
+            
+            update_dict = user.model_dump(exclude_unset=True)
+            if "password" in update_dict:
+                user_db.password_hash = hash_password(update_dict.pop("password"))
+            for field, value in update_dict.items():
+                setattr(user_db, field, value)
+
+            await self.session.commit()
+            await self.session.refresh(user_db)
+            return UserResponse.model_validate(user_db)
+
+        except Exception as e:
+            await self.session.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Ошибка при Обновление пользователя: {str(e)}"
             )
