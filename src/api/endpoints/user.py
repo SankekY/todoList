@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
-from api.deps import get_session, get_user_service
-
+from api.deps import get_session, get_user_service, get_user_token
 from core.schems.user import UserResponse, UserCreate, UserBase, UserUpdate
-from core.schems.token import Token
+from core.schems.token import Token, TokenData
 from core.service.user import UserService
 
-router = APIRouter()
+router = APIRouter(
+)
 
 @router.post(
     "/token",
@@ -45,3 +45,21 @@ async def register_user(
             detail="Такой пользователь уже зарегестрирован"
         )
     return new_user
+
+@router.get(
+    "/me",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK
+)
+async def get_me(
+    token_data: TokenData = Depends(get_user_token),
+    service: UserService = Depends(get_user_service)
+):
+    user = await service.get_user(token_data.username)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Не удолось получить данные с сервера!"
+        )
+    return user
+    

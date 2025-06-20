@@ -29,4 +29,8 @@ class UserService:
             )
         return None
         
-        
+    async def get_user(self, username) -> UserResponse:
+        user_db = await self.repository.get_user(UserUpdate(username=username))
+        if not user_db:
+            return None
+        return UserResponse.model_validate(user_db)

@@ -19,19 +19,23 @@ from core.models.task import Task
 
 
 # --- Depends Code ---
+
+# --- Get UserService ---
 async def get_user_service(
     session: AsyncSession = Depends(get_session)
 ):
     repo = UserRepository(model=Task, session=session)
     return UserService(repository=repo)
 
+#  --- Get TodoService --- 
 async def get_todo_service(
     session: AsyncSession = Depends(get_session)
 ):
     repo = TaskRepository(model=Task, session=session)
     return TaskService(repository=repo)
 
-aouthBearerSchema = OAuth2PasswordBearer(tokenUrl="api/auth/token")
+#  --- Get Current Token --- 
+aouthBearerSchema = OAuth2PasswordBearer(tokenUrl="api/token")
 async def get_user_token(
     token: aouthBearerSchema = Depends()
 ) -> TokenData:
