@@ -24,7 +24,10 @@ class TaskService:
         user_id: int,
         task_id: int
     ) -> TaskResponse:
-        pass
+        task = await self.repository.get_task_by_id(task_id, user_id)
+        if not task:
+            return None
+        return TaskResponse.from_orm(task)
 
     async def create_task(
         self, 
@@ -44,7 +47,7 @@ class TaskService:
         task: TaskUpdate,
         user_id: int
     ) -> TaskResponse:
-        new_task = await self.repository.update_task(task_id, task.dict())    
+        new_task = await self.repository.update_task(task_id, task.dict(), user_id=user_id)    
         if not new_task:
             return None
         return TaskResponse.from_orm(new_task)

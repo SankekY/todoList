@@ -6,17 +6,17 @@ class Token(BaseModel):
     token_type: str = "Bearer"
 
 class TokenData(BaseModel):
-    sub: str | None = None
+    sub: int | None = None
     email: str | None = None
     username: str | None = None
     exp: datetime | None = None
     active: bool | None = None
 
-    # @validator('sub', pre=True)
-    # def convert_sub_to_int(cls, v):
-    #     if v is None:
-    #         return None
-    #     try:
-    #         return int(v)
-    #     except (TypeError, ValueError):
-    #         return None
+    @validator('sub', pre=True)
+    def convert_sub_to_int(cls, v):
+        if v is None:
+            return None
+        try:
+            return int(v)
+        except (TypeError, ValueError):
+            return None
