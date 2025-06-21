@@ -13,13 +13,12 @@ class TaskService:
         self, 
         user_id: int
     ) -> list[TaskResponse]:
-        db_tasks_list = await self.repository.get_all_tasks(user_id=user_id)
-        if not db_tasks_list:
-            return None
-        response_list = []
-        for db_task in db_tasks_list:
-            response_list.append(TaskResponse.from_orm(db_task))
-        return response_list
+        tasks = await self.repository.get_all_tasks(user_id=user_id)
+        if not tasks:
+            return []
+        return [TaskResponse.from_orm(task) for task in tasks]
+
+
     async def get_one_task(
         self,
         user_id: int,
@@ -39,17 +38,23 @@ class TaskService:
             return None
         return TaskResponse.from_orm(new_task)
 
-    async def task_update(
-        self, 
+    async def update_task(
+        self,
         task_id: int,
-        user_id: int, 
-        task_update: TaskUpdate
+        task: TaskUpdate,
+        user_id: int
     ) -> TaskResponse:
-        pass
+        new_task = await self.repository.update_task(task_id, task.dict())    
+        if not new_task:
+            return None
+        return TaskResponse.from_orm(new_task)
 
     async def delete_task(
-        self, 
+        self,
         task_id: int,
         user_id: int
-    ):
-        pass
+    ) -> bool:
+        return await self.repository.delete_task(
+            task_id=task_id, 
+            user_id=user_id
+        )

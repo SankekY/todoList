@@ -16,7 +16,7 @@ async def get_all_tasks(
     service: TaskService  = Depends(get_todo_service)
 ):
     tasks = await service.get_tasks(token_data.sub)
-    if not tasks:
+    if tasks == []:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="У вас нет задач =)"
@@ -53,3 +53,15 @@ async def get_task(
     service: TaskService = Depends(get_todo_service)
 ):
     pass
+
+@router.put(
+    "/tasks/{task_id}"
+)
+async def update_task(
+    task_id: int,
+    task_update: TaskUpdate,
+    token_data: TokenData = Depends(get_user_token),
+    service: TaskService = Depends(get_todo_service)
+):
+    pass
+
