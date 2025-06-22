@@ -3,8 +3,7 @@ from api.endpoints.task import router as task_router
 from fastapi import APIRouter
 
 main_router = APIRouter(
-    prefix="/api",
-    tags=["TodoTasks"]
+    prefix="/api", 
 )
-main_router.include_router(user_router)
-main_router.include_router(task_router)
+main_router.include_router(user_router, tags=["User"])
+main_router.include_router(task_router, tags=["Task"])
