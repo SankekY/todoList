@@ -9,15 +9,6 @@ from fastapi import HTTPException
 class UserRepository(BaseRepository[User]):
     
     async def create_user(self, user: UserCreate) -> UserResponse:
-        """
-        Создает нового пользователя в базе данных
-        Args:
-            user: Данные для создания пользователя (UserCreate schema)
-        Returns:
-            UserResponse: Созданный пользователь
-        Raises:
-            HTTPException: При ошибках валидации или существующем пользователе
-        """
         try:
             existing_user = await self.session.execute(
                 select(User).where(
@@ -87,4 +78,15 @@ class UserRepository(BaseRepository[User]):
             raise HTTPException(
                 status_code=500,
                 detail=f"Ошибка при Обновление пользователя: {str(e)}"
+            )
+
+    async def get_user_by_id(self, id: int) -> UserResponse | None:
+        try:
+            existing_user = await self.session.execute(select(User).where(User.id == id))
+            return existing_user.scalar_one_or_none()
+        except Exception as e:
+            await self.session.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Ошибка при получении пользователя: {str(e)}"
             )

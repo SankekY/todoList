@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
-from api.deps import get_session, get_user_service, get_user_token
-from core.schems.user import UserResponse, UserCreate, UserBase, UserUpdate, UserTokenData
+from api.deps import get_session, get_user_service, get_user_token, get_todo_service
+from core.schems.user import UserResponse, UserCreate, UserBase, UserUpdate, UserTokenData, UserWithTasks
 from core.schems.token import Token, TokenData
 from core.service.user import UserService
+from core.schems.task import TaskBase, TaskResponse
+from core.service.task import TaskService
 
 router = APIRouter(
 )
@@ -85,3 +87,23 @@ async def update_user(
             detail="Ошибка при обновление польтзователя"
         )
     return new_user
+
+@router.get(
+    "/{user_id}/tasks",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK
+)
+async def get_user_tasks(
+    user_id: int,
+    service: UserService = Depends(get_user_service), 
+    task_service: TaskService = Depends(get_todo_service)
+) -> UserResponse:
+    user = await service.get_user_by_id(id=user_id)
+    tasks = await task_service.get_tasks(user_id=user_id)
+    if not user or not tasks:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Пользователь не найден"
+        )
+    user.tasks = tasks
+    return UserWithTasks(**user.dict())

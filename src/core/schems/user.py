@@ -40,6 +40,12 @@ class UserTokenData(UserBase):
     is_active: bool | None = None
     role: str | None = None
 
+class UserWithTasks(UserBase):
+    id: int  # Add this required field
+    is_active: bool  # Add other required fields from UserResponse if needed
+    role: str
+    created_at: datetime
+    tasks: List[TaskResponse] = []
 
 class UserResponse(UserBase):
     id: int

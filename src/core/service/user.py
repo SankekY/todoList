@@ -37,6 +37,12 @@ class UserService:
             return None
         return UserResponse.model_validate(user_db)
 
+    async def get_user_by_id(self, id: int) -> UserBase:
+        user_db = await self.repository.get_user_by_id(id)
+        if not user_db:
+            return None
+        return UserResponse.model_validate(user_db)
+
     async def update_user(self, new_user: UserUpdate, id: int) -> UserResponse:
         user_db = await self.repository.update_user(new_user, id)
         if not user_db:
@@ -44,4 +50,4 @@ class UserService:
         if user_db.id != id:
             return None
         return UserResponse.model_validate(user_db)
-        
+    
